@@ -536,11 +536,9 @@
             }
 
             // Verificar si el estudiante ya existe
-            if (students != null && students.count > 0) {
-                if (students.find(s => s.name.toLowerCase() === name.toLowerCase())) {
-                    alert('Este estudiante ya existe');
-                    return;
-                }
+            if (students.find(s => s.name.toLowerCase() === name.toLowerCase())) {
+                alert('Este estudiante ya existe');
+                return;
             }
 
             const student = {
@@ -582,7 +580,7 @@
             const container = document.getElementById('studentsList');
             container.innerHTML = '';
 
-            if ((students === null) || (students.length === 0)) {
+            if (students.length === 0) {
                 container.innerHTML = '<div class="no-data">No hay estudiantes registrados</div>';
                 return;
             }
@@ -724,8 +722,6 @@
         }
 
         function updateStats() {
-            if (students === null)
-                return;
             const total = students.length;
             let present = 0;
             let absent = 0;
