@@ -580,7 +580,7 @@
             const container = document.getElementById('studentsList');
             container.innerHTML = '';
 
-            if (students.length === 0) {
+            if ((students === null) || (students.length === 0)) {
                 container.innerHTML = '<div class="no-data">No hay estudiantes registrados</div>';
                 return;
             }
