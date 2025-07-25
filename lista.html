@@ -722,6 +722,8 @@
         }
 
         function updateStats() {
+            if (students === null)
+                return;
             const total = students.length;
             let present = 0;
             let absent = 0;
