@@ -413,7 +413,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚽ Academia Soccer</h1>
+            <img src="https://lh3.googleusercontent.com/ZQNypNWcvtmXwGWgQsWs_0_BKYdTDJiJK8wZmjc1jEC9nxPipIZtV2Paa0nI4rt695iiyzRbgsaPCKkzkOe2IcJPxk-CnJ6djTzwtyKxygAqtJhqqxdzW_FYsvu5GXgZlKdNkjPsYUOtM6g7qwgWf-AEdEBcoitQ9WpiIHbI-2IYH3IgB1k57Q=w256">
+            <h1>⚽ Halcones Blaugrana</h1>
             <div class="date" id="currentDate"></div>
             
             <div class="nav-tabs">
@@ -832,6 +833,8 @@
                 // Simular guardado local usando variables globales
                 window.localStudentData = JSON.stringify(students);
                 window.localAttendanceHistory = JSON.stringify(attendanceHistory);
+                localStorage.setItem('students', JSON.stringify(students)); // Store students data
+                localStorage.setItem('history', JSON.stringify(attendanceHistory); // Store history data
             } catch (error) {
                 console.error('Error al guardar:', error);
             }
@@ -842,11 +845,25 @@
                 // Cargar estudiantes
                 if (window.localStudentData) {
                     students = JSON.parse(window.localStudentData);
+                } else {
+                    try {
+                        students = JSON.parse(localStorage.getItem('students')); // Retrieve students from local storage
+                    catch (error) {
+                      // Code to handle the error
+                      console.error("An error occurred:", error.message);
+                    }
                 }
                 
                 // Cargar historial de asistencias
                 if (window.localAttendanceHistory) {
                     attendanceHistory = JSON.parse(window.localAttendanceHistory);
+                } else {
+                    try {
+                        attendanceHistory = JSON.parse(localStorage.getItem('history')); // Retrieve students from local storage
+                    catch (error) {
+                      // Code to handle the error
+                      console.error("An error occurred:", error.message);
+                    }
                 }
             } catch (error) {
                 console.error('Error al cargar:', error);
