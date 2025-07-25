@@ -536,9 +536,11 @@
             }
 
             // Verificar si el estudiante ya existe
-            if (students.find(s => s.name.toLowerCase() === name.toLowerCase())) {
-                alert('Este estudiante ya existe');
-                return;
+            if (students != null && students.count > 0) {
+                if (students.find(s => s.name.toLowerCase() === name.toLowerCase())) {
+                    alert('Este estudiante ya existe');
+                    return;
+                }
             }
 
             const student = {
