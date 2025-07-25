@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistencia Soccer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #00c851, #28a745);
+            color: white;
+            padding: 30px 20px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            opacity: 0.9;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            border-radius: 8px;
+            background: transparent;
+            color: rgba(255,255,255,0.8);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .add-student {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #28a745;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-input-button:hover {
+            background: #e9ecef;
+            border-color: #28a745;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #218838;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .students-list {
+            padding: 0 20px 20px;
+        }
+
+        .student-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            cursor: grab;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .student-item.dragging {
+            transform: rotate(2deg);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .student-item.present {
+            background: linear-gradient(45deg, #d4edda, #c3e6cb);
+            border-left: 5px solid #28a745;
+        }
+
+        .student-item.absent {
+            background: linear-gradient(45deg, #f8d7da, #f5c6cb);
+            border-left: 5px solid #dc3545;
+        }
+
+        .student-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            background: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 20px;
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .student-status {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .status-indicator.present {
+            background: #28a745;
+        }
+
+        .status-indicator.absent {
+            background: #dc3545;
+        }
+
+        .status-indicator.pending {
+            background: #ffc107;
+        }
+
+        .swipe-instructions {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            margin: 20px;
+            border-radius: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 16px;
+        }
+
+        .history-list {
+            padding: 20px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .history-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .history-date {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .history-detail {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .history-detail.show {
+            display: block;
+        }
+
+        .history-student {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .history-student:last-child {
+            border-bottom: none;
+        }
+
+        .history-student-photo {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            background: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .history-student-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .history-student-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .history-student-status.present {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .history-student-status.absent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .history-student-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .reset-day-btn {
+            margin: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+            
+            body {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚽ Academia Soccer</h1>
+            <div class="date" id="currentDate"></div>
+            
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchTab('attendance')">Asistencia</button>
+                <button class="nav-tab" onclick="switchTab('history')">Historial</button>
+            </div>
+        </div>
+
+        <!-- Tab de Asistencia -->
+        <div id="attendanceTab" class="tab-content active">
+            <div class="add-student">
+                <div class="form-group">
+                    <label for="studentName">Nombre del estudiante:</label>
+                    <input type="text" id="studentName" placeholder="Ingresa el nombre">
+                </div>
+                <div class="form-group">
+                    <label>Foto (opcional):</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="studentPhoto" class="file-input" accept="image/*">
+                        <div class="file-input-button">
+                            📷 Seleccionar foto
+                        </div>
+                    </div>
+                </div>
+                <button class="btn" onclick="addStudent()">Agregar Estudiante</button>
+            </div>
+
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalStudents">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="presentCount">0</div>
+                    <div class="stat-label">Presente</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="absentCount">0</div>
+                    <div class="stat-label">Ausente</div>
+                </div>
+            </div>
+
+            <div class="swipe-instructions">
+                Desliza → para asistencia, ← para falta
+            </div>
+
+            <div class="students-list" id="studentsList">
+                <!-- Los estudiantes aparecerán aquí -->
+            </div>
+
+            <div class="reset-day-btn">
+                <button class="btn btn-secondary" onclick="resetDailyAttendance()">
+                    Reiniciar Asistencia del Día
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab de Historial -->
+        <div id="historyTab" class="tab-content">
+            <div class="history-list" id="historyList">
+                <!-- El historial aparecerá aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let students = [];
+        let attendanceHistory = {};
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let currentElement = null;
+        let currentDate = '';
+
+        // Cargar datos al iniciar
+        window.addEventListener('load', function() {
+            updateDate();
+            loadData();
+            renderStudents();
+            updateStats();
+        });
+
+        function updateDate() {
+            const now = new Date();
+            currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('es-ES', options);
+        }
+
+        function switchTab(tab) {
+            // Actualizar botones
+            document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Mostrar/ocultar contenido
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'attendance') {
+                document.getElementById('attendanceTab').classList.add('active');
+            } else if (tab === 'history') {
+                document.getElementById('historyTab').classList.add('active');
+                renderHistory();
+            }
+        }
+
+        function addStudent() {
+            const nameInput = document.getElementById('studentName');
+            const photoInput = document.getElementById('studentPhoto');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert('Por favor ingresa un nombre');
+                return;
+            }
+
+            // Verificar si el estudiante ya existe
+            if (students.find(s => s.name.toLowerCase() === name.toLowerCase())) {
+                alert('Este estudiante ya existe');
+                return;
+            }
+
+            const student = {
+                id: Date.now(),
+                name: name,
+                photo: null,
+                status: 'pending',
+                dateAdded: currentDate
+            };
+
+            // Procesar la foto si se seleccionó
+            if (photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    student.photo = e.target.result;
+                    students.push(student);
+                    saveData();
+                    renderStudents();
+                    updateStats();
+                    
+                    // Limpiar formulario
+                    nameInput.value = '';
+                    photoInput.value = '';
+                };
+                reader.readAsDataURL(photoInput.files[0]);
+            } else {
+                students.push(student);
+                saveData();
+                renderStudents();
+                updateStats();
+                
+                // Limpiar formulario
+                nameInput.value = '';
+                photoInput.value = '';
+            }
+        }
+
+        function renderStudents() {
+            const container = document.getElementById('studentsList');
+            container.innerHTML = '';
+
+            if (students.length === 0) {
+                container.innerHTML = '<div class="no-data">No hay estudiantes registrados</div>';
+                return;
+            }
+
+            students.forEach(student => {
+                const studentDiv = document.createElement('div');
+                const todayAttendance = getTodayAttendance(student.id);
+                studentDiv.className = `student-item ${todayAttendance}`;
+                studentDiv.dataset.studentId = student.id;
+
+                const photoElement = student.photo ? 
+                    `<img src="${student.photo}" alt="${student.name}" class="student-photo">` :
+                    `<div class="student-photo">👤</div>`;
+
+                const statusText = {
+                    'pending': 'Pendiente',
+                    'present': 'Presente',
+                    'absent': 'Ausente'
+                }[todayAttendance];
+
+                studentDiv.innerHTML = `
+                    ${photoElement}
+                    <div class="student-info">
+                        <div class="student-name">${student.name}</div>
+                        <div class="student-status">${statusText}</div>
+                    </div>
+                    <div class="status-indicator ${todayAttendance}"></div>
+                    <button class="delete-btn" onclick="deleteStudent(${student.id})">×</button>
+                `;
+
+                // Eventos táctiles para deslizar
+                studentDiv.addEventListener('touchstart', handleTouchStart, { passive: false });
+                studentDiv.addEventListener('touchmove', handleTouchMove, { passive: false });
+                studentDiv.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+                container.appendChild(studentDiv);
+            });
+        }
+
+        function getTodayAttendance(studentId) {
+            if (attendanceHistory[currentDate] && attendanceHistory[currentDate][studentId]) {
+                return attendanceHistory[currentDate][studentId];
+            }
+            return 'pending';
+        }
+
+        function handleTouchStart(e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            currentElement = e.currentTarget;
+            currentElement.classList.add('dragging');
+        }
+
+        function handleTouchMove(e) {
+            if (!currentElement) return;
+            e.preventDefault();
+            
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+            const deltaX = touchX - touchStartX;
+            const deltaY = touchY - touchStartY;
+            
+            // Solo procesar si el movimiento es más horizontal que vertical
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                currentElement.style.transform = `translateX(${deltaX}px)`;
+                
+                // Cambiar color según la dirección
+                if (deltaX > 50) {
+                    currentElement.style.background = 'linear-gradient(45deg, #d4edda, #c3e6cb)';
+                } else if (deltaX < -50) {
+                    currentElement.style.background = 'linear-gradient(45deg, #f8d7da, #f5c6cb)';
+                }
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!currentElement) return;
+            
+            const touchX = e.changedTouches[0].clientX;
+            const deltaX = touchX - touchStartX;
+            const studentId = parseInt(currentElement.dataset.studentId);
+            
+            currentElement.classList.remove('dragging');
+            currentElement.style.transform = '';
+            currentElement.style.background = '';
+            
+            // Determinar acción basada en la distancia del deslizado
+            if (Math.abs(deltaX) > 100) {
+                if (deltaX > 0) {
+                    // Deslizar a la derecha = Presente
+                    markAttendance(studentId, 'present');
+                } else {
+                    // Deslizar a la izquierda = Ausente
+                    markAttendance(studentId, 'absent');
+                }
+            }
+            
+            currentElement = null;
+        }
+
+        function markAttendance(studentId, status) {
+            // Inicializar el día si no existe
+            if (!attendanceHistory[currentDate]) {
+                attendanceHistory[currentDate] = {};
+            }
+            
+            // Marcar asistencia
+            attendanceHistory[currentDate][studentId] = status;
+            
+            saveData();
+            renderStudents();
+            updateStats();
+        }
+
+        function deleteStudent(studentId) {
+            if (confirm('¿Estás seguro de eliminar este estudiante?')) {
+                students = students.filter(s => s.id !== studentId);
+                
+                // Eliminar también del historial
+                Object.keys(attendanceHistory).forEach(date => {
+                    delete attendanceHistory[date][studentId];
+                });
+                
+                saveData();
+                renderStudents();
+                updateStats();
+            }
+        }
+
+        function resetDailyAttendance() {
+            if (confirm('¿Estás seguro de reiniciar la asistencia del día? Esta acción no se puede deshacer.')) {
+                if (attendanceHistory[currentDate]) {
+                    delete attendanceHistory[currentDate];
+                }
+                saveData();
+                renderStudents();
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            const total = students.length;
+            let present = 0;
+            let absent = 0;
+            
+            if (attendanceHistory[currentDate]) {
+                students.forEach(student => {
+                    const status = attendanceHistory[currentDate][student.id];
+                    if (status === 'present') present++;
+                    else if (status === 'absent') absent++;
+                });
+            }
+            
+            document.getElementById('totalStudents').textContent = total;
+            document.getElementById('presentCount').textContent = present;
+            document.getElementById('absentCount').textContent = absent;
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            container.innerHTML = '';
+            
+            const dates = Object.keys(attendanceHistory).sort().reverse();
+            
+            if (dates.length === 0) {
+                container.innerHTML = '<div class="no-data">No hay historial de asistencias</div>';
+                return;
+            }
+            
+            dates.forEach(date => {
+                const attendance = attendanceHistory[date];
+                const dateObj = new Date(date);
+                const formattedDate = dateObj.toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                let present = 0;
+                let absent = 0;
+                let total = 0;
+                
+                students.forEach(student => {
+                    if (attendance[student.id]) {
+                        total++;
+                        if (attendance[student.id] === 'present') present++;
+                        else if (attendance[student.id] === 'absent') absent++;
+                    }
+                });
+                
+                if (total === 0) return; // Skip dates with no attendance
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-date">
+                        <span>${formattedDate}</span>
+                        <span>📊</span>
+                    </div>
+                    <div class="history-stats">
+                        <span>Total: ${total}</span>
+                        <span style="color: #28a745;">Presentes: ${present}</span>
+                        <span style="color: #dc3545;">Ausentes: ${absent}</span>
+                    </div>
+                    <div class="history-detail" id="detail-${date}">
+                        ${renderHistoryDetail(date, attendance)}
+                    </div>
+                `;
+                
+                historyItem.addEventListener('click', () => toggleHistoryDetail(date));
+                container.appendChild(historyItem);
+            });
+        }
+
+        function renderHistoryDetail(date, attendance) {
+            let html = '';
+            students.forEach(student => {
+                if (attendance[student.id]) {
+                    const status = attendance[student.id];
+                    const statusText = {
+                        'present': 'Presente',
+                        'absent': 'Ausente',
+                        'pending': 'Pendiente'
+                    }[status];
+                    
+                    const photoElement = student.photo ? 
+                        `<img src="${student.photo}" alt="${student.name}" class="history-student-photo">` :
+                        `<div class="history-student-photo">👤</div>`;
+                    
+                    html += `
+                        <div class="history-student">
+                            ${photoElement}
+                            <span class="history-student-name">${student.name}</span>
+                            <span class="history-student-status ${status}">${statusText}</span>
+                        </div>
+                    `;
+                }
+            });
+            return html;
+        }
+
+        function toggleHistoryDetail(date) {
+            const detail = document.getElementById(`detail-${date}`);
+            detail.classList.toggle('show');
+        }
+
+        function saveData() {
+            try {
+                // Simular guardado local usando variables globales
+                window.localStudentData = JSON.stringify(students);
+                window.localAttendanceHistory = JSON.stringify(attendanceHistory);
+            } catch (error) {
+                console.error('Error al guardar:', error);
+            }
+        }
+
+        function loadData() {
+            try {
+                // Cargar estudiantes
+                if (window.localStudentData) {
+                    students = JSON.parse(window.localStudentData);
+                }
+                
+                // Cargar historial de asistencias
+                if (window.localAttendanceHistory) {
+                    attendanceHistory = JSON.parse(window.localAttendanceHistory);
+                }
+            } catch (error) {
+                console.error('Error al cargar:', error);
+                students = [];
+                attendanceHistory = {};
+            }
+        }
+
+        // Prevenir el scroll cuando se está deslizando
+        document.addEventListener('touchmove', function(e) {
+            if (currentElement) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
